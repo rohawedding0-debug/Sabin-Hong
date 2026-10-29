@@ -1,25 +1,23 @@
-# 사빈의 채용 레이더 — 자동 배포 설정
+# 사빈의 채용 레이더 — 자동 공고 추가
 
-기존 2024~2026 채용 레이더 v8을 포함합니다. **새 공고 자동 수집은 포함하지 않습니다.** 모집 상태는 접속 날짜를 기준으로 브라우저에서 계산합니다.
+기존 46건의 채용 이력을 유지하면서 고용24 **공채속보**에 올라온 관련 공고를 매일 검색하여 `data/auto_jobs.json`에 중복 없이 저장하고 Netlify를 자동 재배포합니다.
 
-## 최초 1회 설정
+## 필요한 초기 설정
 
-1. GitHub에서 `sabin-career-radar` 새 저장소를 만듭니다. 공개(public) 또는 비공개(private) 저장소를 선택할 수 있습니다.
-2. 저장소의 **Add file → Upload files**에서 이 폴더 안의 `index.html`, `netlify.toml`, `.gitignore`, `README.md`를 업로드하고 **Commit changes**를 누릅니다. (ZIP 파일 그대로 올리는 것이 아닙니다.)
-3. 기존 Netlify 사이트 관리자에서 **Project configuration → Developer settings → Continuous deployment → Repository → Link repository**로 이동합니다.
-4. GitHub 접근을 허용하고 위에서 만든 저장소를 선택합니다. 배포 브랜치 `main`, 게시 경로 `.`(점), 빌드 명령어는 비워둡니다.
-5. 첫 배포가 `Published`가 되면 기존 Netlify 사이트 주소로 접속해 최신 내용이 보이는지 확인합니다.
+1. 이 저장소 파일을 GitHub `rohawedding0-debug/Sabin-Hong`에 **폴더 구조를 유지해** 업로드합니다 (`.github/workflows/daily-jobs.yml`, `scripts/sync_jobs.py`, `data/auto_jobs.json`, `index.html`).
+2. 고용24 **기업회원용 OPEN API**를 신청하여 **공채속보** 이용 승인을 받고 인증키를 발급받습니다. 이용 요건 확인: https://www.work24.go.kr/cm/e/a/0110/selectOpenApiIntro.do
+3. GitHub 저장소 → **Settings → Secrets and variables → Actions → New repository secret** 에서 이름을 `WORK24_API_KEY`로 지정하고 키를 저장합니다. **공개 파일이나 채팅에 키를 적지 마세요.**
+4. GitHub **Actions → 매일 채용공고 자동 확인 → Run workflow** 로 첫 실행을 테스트합니다. 문제가 없으면 매일 한국시간 오전 9시 20분쯤 자동으로 실행됩니다(실제 실행은 GitHub 스케줄에 따라 지연 가능).
+5. Netlify 프로젝트가 같은 GitHub 저장소의 `main` 브랜치에 연결되어 있어야 수정된 데이터가 자동으로 사이트에 배포됩니다.
 
-## 이후 수정
+## 기능과 제한
 
-- GitHub 저장소에서 `index.html`을 열고 연필 아이콘(**Edit this file**)을 눌러 변경한 뒤 **Commit changes**를 누르면 Netlify가 자동 배포합니다.
-- ChatGPT에서 새 HTML 수정본을 받았다면 GitHub의 `index.html`을 그 내용으로 **교체해 커밋**해야 합니다. 이 채팅에서 수정했다고 GitHub에 자동 업로드되지는 않습니다.
-- 배포 완료 후 브라우저를 새로고침합니다. 같은 Netlify 주소를 사용할 수 있습니다.
+- 모집 분야: 소재·화학 R&D, 생산·공정 기술, 제조 데이터·DX, ESG·환경 데이터.
+- 범위: 고용24 공채속보의 **대기업(10)·중견기업(40)** 및 **정규직(10)** 목록. 신입과 경력 모두 확인.
+- 채용연계형 인턴·영업 등 제외. 키워드 기반 분류로 오분류가 있을 수 있으며, 실제 지원 가능 여부는 공고 원문 확인.
+- 공고 제목과 모집 기간, 기업명, 공식 채용 링크만 자동 수집. 상세 JD·필수 경력·회사 평균연봉은 추정하지 않음.
+- 이미 있던 46건은 삭제하지 않음. 365일 이내 마감된 자동 발견 공고는 이력으로 보관.
+- **자소설닷컴 직접 수집은 포함하지 않음**. 공식 접근 권한과 안정적인 API가 확인될 때 연결 가능.
+- 등록된 인증키가 없으면 기존 사이트는 작동하지만 신규 공고 자동 수집은 실행되지 않음.
 
-## 구분할 것
-
-- **자동 배포:** GitHub에 변경사항이 저장될 때 사이트가 자동 갱신됩니다.
-- **모집 상태 자동 표시:** 기존 공고의 날짜를 읽어 접속일 기준으로 표시합니다.
-- **신규 공고 자동 수집:** 별도 데이터 수집·검증·등록 프로그램이 필요합니다. 이 배포에는 포함되지 않습니다.
-
-Git 연동 공식 설명: https://docs.netlify.com/build/git-workflows/repo-permissions-linking/
+공식 문서: https://www.work24.go.kr/cm/e/a/0110/selectOpenApiSvcInfo.do?fullApiSvcId=000000000000000000000000000000%5E000000000000000000000000000079
